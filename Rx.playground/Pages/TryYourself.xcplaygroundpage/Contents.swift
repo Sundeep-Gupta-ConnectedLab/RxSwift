@@ -1,10 +1,10 @@
 import RxSwift
 
 class Project {
+    private let developerSubject = PublishSubject<Developer>()
     var developerStream: Observable<Developer> {
         return developerSubject.asObservable()
     }
-    private let developerSubject = PublishSubject<Developer>()
     
     func addDeveloper(_ developer: Developer) {
         developerSubject.onNext(developer)
@@ -20,8 +20,8 @@ class Project {
 }
 
 class Developer {
-    let name: String
     private let commitSubject = PublishSubject<Commit>()
+    let name: String
     
     init(_ name: String) {
         self.name = name
@@ -35,7 +35,7 @@ class Developer {
         commitSubject.onCompleted()
     }
     
-    // Helpers to simulate coding activity.
+    // Helpers to externally simulate coding activity.
     
     func pushCommit(_ hash: String) {
         commitSubject.onNext(Commit(author: name, hash: hash))
@@ -76,12 +76,10 @@ let bob = Developer("Bob")
 let ci = CI()
 
 project.developerStream
-    .debug("developer stream")
     .flatMap { developer -> Observable<Commit> in
         print("\(developer.name) started coding...")
-        return developer.startCoding().debug(developer.name)
+        return developer.startCoding()
     }
-    .debug("commit stream")
     .subscribe(ci)
 
 ////////////////////////////////////////////////////////////
@@ -134,36 +132,10 @@ jim.pushCommit("2") // CI is building Commit(author: "Jim", hash: "2").
 /////////////////////////////////////////////////////////////
 // ci completion
 
-jim.stopCoding()
-project.stop()
-anna.stopCoding() // CI stopped.
-
-project.addDeveloper(bob) // (No event is emitted.)
-bob.pushCommit("1") // (No event is emitted.)
-jim.pushCommit("3") // (No event is emitted.)
-
-
-
-
-// MARK: - FlatMapLatest
-//developerAdded
-//    .flatMapLatest { developer -> Observable<Commit> in
-//        return developer.startCoding()
-//    }
-//    .subscribe(ci)
+//jim.stopCoding()
+//project.stop()
+//anna.stopCoding() // CI stopped.
 //
-//let jim = Developer(name: "Jim")
-//let anna = Developer(name: "Anna")
-//
-//project.addDeveloper(jim)
-//jim.pushCommit("1")
-//
-//project.addDeveloper(anna)
-//jim.pushCommit("2")
-//
-//
-//anna.pushCommit("1")
-//
-//jim.pushCommit("2")
-//
-//anna.pushCommit("2")
+//project.addDeveloper(bob) // (No event is emitted.)
+//bob.pushCommit("1") // (No event is emitted.)
+//jim.pushCommit("3") // (No event is emitted.)
