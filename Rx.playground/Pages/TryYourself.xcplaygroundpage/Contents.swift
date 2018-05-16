@@ -85,13 +85,39 @@ project.developerStream
 ////////////////////////////////////////////////////////////
 // Normal operation
 
-project.addDeveloper(jim) // Jim started coding...
-jim.pushCommit("1") // CI is building Commit(author: "Jim", hash: "1").
-
+project.addDeveloper(jim)  // Jim started coding...
+jim.pushCommit("1")        // CI is building Commit(author: "Jim", hash: "1").
 project.addDeveloper(anna) // Anna started coding...
-anna.pushCommit("1") // CI is building Commit(author: "Anna", hash: "1").
+anna.pushCommit("1")       // CI is building Commit(author: "Anna", hash: "1").
+jim.pushCommit("2")        // CI is building Commit(author: "Jim", hash: "2").
 
-jim.pushCommit("2") // CI is building Commit(author: "Jim", hash: "2").
+/////////////////////////////////////////////////////////////
+// project completion
+
+//project.stop()
+//project.addDeveloper(bob)
+//bob.pushCommit("1")
+//jim.pushCommit("3")       // CI is building Commit(author: "Jim", hash: "3").
+
+/////////////////////////////////////////////////////////////
+// Developer completion
+
+//jim.stopCoding()
+//anna.stopCoding()
+//jim.pushCommit("3")
+//project.addDeveloper(bob) // Bob started coding...
+//bob.pushCommit("1")       // CI is building Commit(author: "Bob", hash: "1").
+
+/////////////////////////////////////////////////////////////
+// ci completion
+
+project.stop()
+anna.stopCoding()
+jim.stopCoding()          // CI stopped.
+project.addDeveloper(bob)
+bob.pushCommit("1")
+jim.pushCommit("1")
+
 
 //////////////////////////////////////////////////////////
 // When the project errors, the flatMap and CI stop subscribing.
@@ -110,32 +136,3 @@ jim.pushCommit("2") // CI is building Commit(author: "Jim", hash: "2").
 //anna.pushCommit("2") // (No event is emitted.)
 //project.addDeveloper(bob) // (No event is emitted.)
 //bob.pushCommit("3") // (No event is emitted.)
-
-/////////////////////////////////////////////////////////////
-// project completion
-
-//project.stop()
-//project.addDeveloper(Developer("Bob")) // (No event is emitted.)
-//jim.pushCommit("3") // CI is building Commit(author: "Jim", hash: "3").
-
-/////////////////////////////////////////////////////////////
-// Developer completion
-
-//jim.stopCoding()
-//anna.stopCoding()
-//
-//jim.pushCommit("3") // (No event is emitted.)
-//
-//project.addDeveloper(bob) // Bob started coding...
-//bob.pushCommit("1") // CI is building Commit(author: "Bob", hash: "1").
-
-/////////////////////////////////////////////////////////////
-// ci completion
-
-//jim.stopCoding()
-//project.stop()
-//anna.stopCoding() // CI stopped.
-//
-//project.addDeveloper(bob) // (No event is emitted.)
-//bob.pushCommit("1") // (No event is emitted.)
-//jim.pushCommit("3") // (No event is emitted.)
