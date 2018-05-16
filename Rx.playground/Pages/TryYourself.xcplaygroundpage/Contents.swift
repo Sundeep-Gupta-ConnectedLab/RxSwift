@@ -13,10 +13,6 @@ class Project {
     func stop() {
         developerSubject.onCompleted()
     }
-    
-    func error() {
-        developerSubject.onError(Errors.projectError)
-    }
 }
 
 class Developer {
@@ -35,14 +31,9 @@ class Developer {
         commitSubject.onCompleted()
     }
     
-    // Helpers to externally simulate coding activity.
-    
+    // Helper to externally simulate coding activity.
     func pushCommit(_ hash: String) {
         commitSubject.onNext(Commit(author: name, hash: hash))
-    }
-    
-    func pushBrokenBuild() {
-        commitSubject.onError(Errors.developerError)
     }
 }
 
@@ -59,11 +50,6 @@ class CI: ObserverType {
         case .error(let error): print("CI errored: \(error).")
         }
     }
-}
-
-enum Errors: Error {
-    case developerError
-    case projectError
 }
 
 ////////////////////////////////////////////////////////
@@ -117,22 +103,3 @@ jim.stopCoding()          // CI stopped.
 project.addDeveloper(bob)
 bob.pushCommit("1")
 jim.pushCommit("1")
-
-
-//////////////////////////////////////////////////////////
-// When the project errors, the flatMap and CI stop subscribing.
-
-//project.error() // CI errored: projectError.
-//
-//jim.pushCommit("3") // (No event is emitted.)
-//project.addDeveloper(bob) // (No event is emitted.)
-//bob.pushCommit("3") // (No event is emitted.)
-
-/////////////////////////////////////////////////////////////
-// When a developer errors, the same thing happens, everything dies.
-
-//jim.pushBrokenBuild() // CI errored: developerError.
-//
-//anna.pushCommit("2") // (No event is emitted.)
-//project.addDeveloper(bob) // (No event is emitted.)
-//bob.pushCommit("3") // (No event is emitted.)
